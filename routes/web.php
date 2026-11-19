@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\TagController;
+use App\Models\Category;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PageController::class, 'home'])->name('home');
@@ -13,7 +14,11 @@ Route::get('/heure', [PageController::class, 'time'])->name('time');
 Route::get('/posts/archive/{year}', [PostController::class, 'archive'])
     ->whereNumber('year')
     ->name('posts.archive');
-Route::get('/posts/categorie/{category:slug}', [PostController::class, 'byCategory'])->name('posts.category');
+Route::get('/posts/categorie/{category:slug}', [PostController::class, 'byCategory'])
+    ->name('posts.category')
+    ->missing(fn () => response()->view('errors.categorie-introuvable', [
+        'categories' => Category::orderBy('name')->get(),
+    ], 404));
 Route::get('/posts/tag/{tag:slug}', [PostController::class, 'byTag'])->name('posts.tag');
 
 Route::middleware('writable')->group(function () {
