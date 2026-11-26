@@ -159,3 +159,21 @@ Back-office des catégories et des tags, messages de validation en français, pa
 ![Barre de navigation d'un utilisateur connecté, avec le message « Vous êtes connecté. »](screenshots/s11-connexion.png)
 
 ![Page 403 quand un auteur ouvre la modification de l'article d'un autre auteur](screenshots/s11-interdit.png)
+
+## Comparaison avec le starter kit Livewire
+
+| Critère | Mini-CMS (authentification manuelle) | Starter kit Livewire |
+|---|---|---|
+| Routes d'authentification | `routes/web.php` (routes écrites à la main) | `routes/auth.php` |
+| Inscription | `app/Http/Controllers/Auth/RegisterController.php` + `app/Http/Requests/RegisterRequest.php` | `app/Livewire/Auth/Register.php` + `resources/views/livewire/auth/register.blade.php` |
+| Connexion | `app/Http/Controllers/Auth/LoginController.php` + `app/Http/Requests/LoginRequest.php` | `app/Livewire/Auth/Login.php` + `app/Livewire/Forms/LoginForm.php` |
+| Déconnexion | `LoginController::destroy()` (route POST `/deconnexion`) | `app/Livewire/Actions/Logout.php` |
+| Limitation des tentatives | absente (aucun `RateLimiter`) | `app/Livewire/Forms/LoginForm.php` |
+| Mot de passe oublié | absent | `app/Livewire/Auth/ForgotPassword.php` + `ResetPassword.php` |
+| Vérification de l'e-mail | absente (`MustVerifyEmail` non implémenté) | `app/Livewire/Auth/VerifyEmail.php` + `User implements MustVerifyEmail` |
+| Double authentification | absente | `app/Livewire/Settings/TwoFactor.php` + `config/fortify.php` |
+| Rôles et autorisations | `app/Policies/PostPolicy.php`, Gates `manage-categories`/`manage-tags` (`app/Providers/AppServiceProvider.php`), `app/Http/Middleware/EnsureUserIsAdmin.php`, colonne `role` | aucun rôle prédéfini dans le kit (les policies sont à ajouter soi-même) |
+| Tests | `tests/Feature/AuthTest.php`, `tests/Feature/AuthorizationTest.php` (Pest, 64 tests) | `tests/Feature/Auth/*Test.php` (Pest) |
+| Framework de test | Pest | Pest |
+
+Ce que je garderais du kit dans un vrai projet : la vérification d'e-mail et la limitation des tentatives de connexion, déjà branchées et testées alors qu'elles seraient à écrire entièrement à la main. Je garderais aussi le découpage en composants Livewire, qui évite de dupliquer les règles de validation entre le formulaire et le contrôleur.
